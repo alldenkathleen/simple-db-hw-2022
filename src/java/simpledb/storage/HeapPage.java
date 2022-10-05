@@ -1,3 +1,4 @@
+
 package simpledb.storage;
 
 import simpledb.common.Catalog;
@@ -7,6 +8,7 @@ import simpledb.common.Debug;
 import simpledb.transaction.TransactionId;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -50,17 +52,16 @@ public class HeapPage implements Page {
         this.td = Database.getCatalog().getTupleDesc(id.getTableId());
         this.numSlots = getNumTuples();
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
-
         // allocate and read the header slots of this page
         header = new byte[getHeaderSize()];
         for (int i = 0; i < header.length; i++)
-            header[i] = dis.readByte();
-
+        header[i] = dis.readByte();
+        
         tuples = new Tuple[numSlots];
         try {
             // allocate and read the actual records of this page
             for (int i = 0; i < tuples.length; i++)
-                tuples[i] = readNextTuple(dis, i);
+            tuples[i] = readNextTuple(dis, i);
         } catch (NoSuchElementException e) {
             e.printStackTrace();
         }
@@ -76,8 +77,7 @@ public class HeapPage implements Page {
      */
     private int getNumTuples() {
         // TODO: some code goes here
-        return 0;
-
+        return (BufferPool.getPageSize()*8) / (this.td.getSize() * 8 + 1);
     }
 
     /**
@@ -86,10 +86,11 @@ public class HeapPage implements Page {
      * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      */
     private int getHeaderSize() {
-
         // TODO: some code goes here
-        return 0;
-
+        if (numSlots % 8 == 0){
+            return numSlots / 8;
+        } 
+        return numSlots / 8 + 1;
     }
 
     /**
@@ -122,7 +123,7 @@ public class HeapPage implements Page {
      */
     public HeapPageId getId() {
         // TODO: some code goes here
-        throw new UnsupportedOperationException("implement this");
+        return this.pid;
     }
 
     /**
@@ -286,7 +287,7 @@ public class HeapPage implements Page {
     public TransactionId isDirty() {
         // TODO: some code goes here
         // Not necessary for lab1
-        return null;      
+        return null;
     }
 
     /**
@@ -294,7 +295,14 @@ public class HeapPage implements Page {
      */
     public int getNumUnusedSlots() {
         // TODO: some code goes here
-        return 0;
+        int tot = 0;
+        for (int i = 0; i < tuples.length; i++) {
+            // empty slot
+            if (!isSlotUsed(i)) {
+                tot ++;
+            }
+        }
+        return tot;
     }
 
     /**
@@ -302,7 +310,9 @@ public class HeapPage implements Page {
      */
     public boolean isSlotUsed(int i) {
         // TODO: some code goes here
-        return false;
+        int x = i / 8;
+        int y = i % 8;
+        return ((this.header[x]) & (0x01 << y)) != 0;
     }
 
     /**
@@ -319,8 +329,14 @@ public class HeapPage implements Page {
      */
     public Iterator<Tuple> iterator() {
         // TODO: some code goes here
-        return null;
+        ArrayList<Tuple> usedSlots = new ArrayList<>();
+        for (int i = 0; i < tuples.length; i++) {
+            // empty slot
+            if (isSlotUsed(i) && tuples[i] != null) {
+                usedSlots.add(tuples[i]);
+            }
+        }
+        return usedSlots.iterator();
     }
 
 }
-

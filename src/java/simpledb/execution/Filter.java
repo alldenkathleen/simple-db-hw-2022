@@ -1,11 +1,16 @@
 package simpledb.execution;
 
+import simpledb.common.Database;
 import simpledb.common.DbException;
 import simpledb.storage.Tuple;
 import simpledb.storage.TupleDesc;
+import simpledb.storage.TupleDesc.TDItem;
 import simpledb.transaction.TransactionAbortedException;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import javax.xml.catalog.Catalog;
 
 /**
  * Filter is an operator that implements a relational select.
@@ -13,6 +18,9 @@ import java.util.NoSuchElementException;
 public class Filter extends Operator {
 
     private static final long serialVersionUID = 1L;
+    private Predicate p;
+    private OpIterator child;
+    private OpIterator[] children;
 
     /**
      * Constructor accepts a predicate to apply and a child operator to read
@@ -22,30 +30,34 @@ public class Filter extends Operator {
      * @param child The child operator
      */
     public Filter(Predicate p, OpIterator child) {
-        // TODO: some code goes here
+        this.p = p;
+        this.child = child;
+        this.open = false;
+        this.children = null;
     }
 
     public Predicate getPredicate() {
-        // TODO: some code goes here
-        return null;
+        return p;
     }
 
     public TupleDesc getTupleDesc() {
-        // TODO: some code goes here
-        return null;
+        return child.getTupleDesc();
     }
 
     public void open() throws DbException, NoSuchElementException,
             TransactionAbortedException {
-        // TODO: some code goes here
+        child.open();
+        open = true;
     }
 
     public void close() {
-        // TODO: some code goes here
+        child.close();
+        open = false;
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
-        // TODO: some code goes here
+        child.rewind();
+        open = true;
     }
 
     /**
@@ -59,19 +71,23 @@ public class Filter extends Operator {
      */
     protected Tuple fetchNext() throws NoSuchElementException,
             TransactionAbortedException, DbException {
-        // TODO: some code goes here
+        while(child.hasNext()){
+            Tuple n = child.next();
+            if(p.filter(n)){
+                return n;
+            }
+        }
         return null;
     }
 
     @Override
     public OpIterator[] getChildren() {
-        // TODO: some code goes here
-        return null;
+        return children;
     }
 
     @Override
     public void setChildren(OpIterator[] children) {
-        // TODO: some code goes here
+        this.children=children;
     }
 
 }

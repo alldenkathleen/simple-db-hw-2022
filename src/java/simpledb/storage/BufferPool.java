@@ -8,9 +8,12 @@ import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import javax.xml.catalog.Catalog;
 
 /**
  * BufferPool manages the reading and writing of pages into memory from
@@ -37,16 +40,22 @@ public class BufferPool {
      * constructor instead.
      */
     public static final int DEFAULT_PAGES = 50;
+    private ArrayList<Page> pages;
 
+    private int maxPages;
     /**
      * Creates a BufferPool that caches up to numPages pages.
      *
      * @param numPages maximum number of pages in this buffer pool.
      */
     public BufferPool(int numPages) {
-        // TODO: some code goes here
+        this.pages = new ArrayList<Page>();
+        this.maxPages = numPages;
     }
 
+    public int getMaxPages(){
+        return maxPages;
+    }
     public static int getPageSize() {
         return pageSize;
     }
@@ -78,8 +87,19 @@ public class BufferPool {
      */
     public Page getPage(TransactionId tid, PageId pid, Permissions perm)
             throws TransactionAbortedException, DbException {
-        // TODO: some code goes here
-        return null;
+        for(Page p: pages){
+            if(p!=null && p.getId().equals(pid)){
+                return p;
+            }
+        }
+        if(pages.size()==maxPages){
+            throw new DbException("No more room!");
+        }
+        else{
+            Page newPage = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
+            pages.add(newPage);
+            return newPage;
+        }
     }
 
     /**
