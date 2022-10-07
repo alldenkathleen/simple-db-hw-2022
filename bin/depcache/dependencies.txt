@@ -629,11 +629,22 @@ simpledb.execution.Predicate$Op
 simpledb.storage.StringField$1
 simpledb.execution.Predicate
 ||:simpledb.execution.StringAggregator
+java.util.Iterator
+simpledb.common.Type
+simpledb.storage.Tuple
+simpledb.storage.IntField
+java.util.Set
+java.util.HashMap
+simpledb.storage.Field
+java.lang.Integer
+simpledb.storage.TupleDesc
+java.util.ArrayList
 simpledb.execution.Aggregator$Op
 simpledb.execution.StringAggregator
-java.lang.UnsupportedOperationException
+simpledb.storage.TupleIterator
 simpledb.execution.Aggregator
 java.lang.Object
+[Lsimpledb.common.Type;
 ||:simpledb.storage.LogFile 2
 java.lang.Throwable
 java.io.RandomAccessFile
@@ -725,6 +736,7 @@ simpledb.execution.Predicate
 simpledb.systemtest.SimpleDbTestBase
 simpledb.TestUtil
 simpledb.execution.OpIterator
+junit.framework.JUnit4TestAdapter
 simpledb.JoinTest
 simpledb.execution.JoinPredicate
 simpledb.execution.Predicate$Op
@@ -1185,11 +1197,25 @@ simpledb.storage.HeapPageId
 simpledb.common.Catalog
 org.junit.Assert
 ||:simpledb.execution.IntegerAggregator
+java.io.PrintStream
+java.util.Iterator
+simpledb.common.Type
+java.lang.System
+simpledb.storage.Tuple
+simpledb.storage.IntField
+java.util.Set
+java.util.HashMap
+simpledb.storage.Field
+java.lang.Integer
+simpledb.storage.TupleDesc
+java.util.ArrayList
 simpledb.execution.Aggregator$Op
-java.lang.UnsupportedOperationException
+simpledb.storage.TupleIterator
+java.util.Map
 simpledb.execution.IntegerAggregator
 simpledb.execution.Aggregator
 java.lang.Object
+[Lsimpledb.common.Type;
 ||:simpledb.systemtest.AggregateTest
 junit.framework.JUnit4TestAdapter
 java.util.HashMap
@@ -1441,11 +1467,16 @@ java.util.NoSuchElementException
 simpledb.transaction.TransactionAbortedException
 ||:simpledb.execution.Aggregate
 simpledb.execution.Aggregator$Op
+simpledb.execution.StringAggregator
 simpledb.common.DbException
+simpledb.execution.OpIterator
+simpledb.common.Type
+simpledb.execution.IntegerAggregator
 simpledb.execution.Aggregator
 simpledb.execution.Operator
 java.util.NoSuchElementException
 simpledb.execution.Aggregate
+simpledb.storage.TupleDesc
 simpledb.transaction.TransactionAbortedException
 ||:simpledb.storage.Tuple 2
 java.lang.invoke.MethodHandles$Lookup
@@ -1582,10 +1613,8 @@ java.lang.Object
 simpledb.transaction.TransactionId 2
 java.io.Serializable
 ||:simpledb.execution.Join
-java.io.PrintStream
 simpledb.common.DbException
 simpledb.execution.OpIterator
-java.lang.System
 simpledb.storage.Tuple
 simpledb.execution.Operator
 simpledb.execution.JoinPredicate

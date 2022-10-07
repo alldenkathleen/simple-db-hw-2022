@@ -60,46 +60,46 @@ public class JoinTest extends SimpleDbTestBase {
                     7, 8, 5, 6, 7 });
   }
 
-  // /**
-  //  * Unit test for Join.getTupleDesc()
-  //  */
-  // @Test public void getTupleDesc() {
-  //   JoinPredicate pred = new JoinPredicate(0, Predicate.Op.EQUALS, 0);
-  //   Join op = new Join(pred, scan1, scan2);
-  //   TupleDesc expected = Utility.getTupleDesc(width1 + width2);
-  //   TupleDesc actual = op.getTupleDesc();
-  //   assertEquals(expected, actual);
-  // }
+  /**
+   * Unit test for Join.getTupleDesc()
+   */
+  @Test public void getTupleDesc() {
+    JoinPredicate pred = new JoinPredicate(0, Predicate.Op.EQUALS, 0);
+    Join op = new Join(pred, scan1, scan2);
+    TupleDesc expected = Utility.getTupleDesc(width1 + width2);
+    TupleDesc actual = op.getTupleDesc();
+    assertEquals(expected, actual);
+  }
 
-  // /**
-  //  * Unit test for Join.rewind()
-  //  */
-  // @Test public void rewind() throws Exception {
-  //   JoinPredicate pred = new JoinPredicate(0, Predicate.Op.EQUALS, 0);
-  //   Join op = new Join(pred, scan1, scan2);
-  //   op.open();
-  //   while (op.hasNext()) {
-  //     assertNotNull(op.next());
-  //   }
-  //   assertTrue(TestUtil.checkExhausted(op));
-  //   op.rewind();
+  /**
+   * Unit test for Join.rewind()
+   */
+  @Test public void rewind() throws Exception {
+    JoinPredicate pred = new JoinPredicate(0, Predicate.Op.EQUALS, 0);
+    Join op = new Join(pred, scan1, scan2);
+    op.open();
+    while (op.hasNext()) {
+      assertNotNull(op.next());
+    }
+    assertTrue(TestUtil.checkExhausted(op));
+    op.rewind();
 
-  //   eqJoin.open();
-  //   Tuple expected = eqJoin.next();
-  //   Tuple actual = op.next();
-  //   assertTrue(TestUtil.compareTuples(expected, actual));
-  // }
+    eqJoin.open();
+    Tuple expected = eqJoin.next();
+    Tuple actual = op.next();
+    assertTrue(TestUtil.compareTuples(expected, actual));
+  }
 
-  // /**
-  //  * Unit test for Join.getNext() using a &gt; predicate
-  //  */
-  // @Test public void gtJoin() throws Exception {
-  //   JoinPredicate pred = new JoinPredicate(0, Predicate.Op.GREATER_THAN, 0);
-  //   Join op = new Join(pred, scan1, scan2);
-  //   op.open();
-  //   gtJoin.open();
-  //   TestUtil.matchAllTuples(gtJoin, op);
-  // }
+  /**
+   * Unit test for Join.getNext() using a &gt; predicate
+   */
+  @Test public void gtJoin() throws Exception {
+    JoinPredicate pred = new JoinPredicate(0, Predicate.Op.GREATER_THAN, 0);
+    Join op = new Join(pred, scan1, scan2);
+    op.open();
+    gtJoin.open();
+    TestUtil.matchAllTuples(gtJoin, op);
+  }
 
   /**
    * Unit test for Join.getNext() using an = predicate
@@ -112,11 +112,11 @@ public class JoinTest extends SimpleDbTestBase {
     TestUtil.matchAllTuples(eqJoin, op);
   }
 
-//   /**
-//    * JUnit suite target
-//    */
-//   public static junit.framework.Test suite() {
-//     return new JUnit4TestAdapter(JoinTest.class);
-//   }
+  /**
+   * JUnit suite target
+   */
+  public static junit.framework.Test suite() {
+    return new JUnit4TestAdapter(JoinTest.class);
+  }
 }
 

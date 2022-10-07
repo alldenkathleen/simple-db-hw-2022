@@ -102,124 +102,31 @@ public class Join extends Operator {
      * @see JoinPredicate#filter
      */
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
-        // if(next1!=null){
-        //     while(child1.hasNext()){
-        //         Tuple child1Next = child1.next();
-        //         while(child2.hasNext()){
-        //             System.out.println("CHILD 1");
-        //             System.out.println(child1Next.getFields().toString());
-        //             System.out.println("CHILD 2");
-        //             System.out.println(child2.next().getFields().toString());
-        //         }
-        //     }
-        // }
-        // else{
-        //     next1=child1.next();
-        //     while(child1.hasNext()){
-        //         Tuple child1Next = child1.next();
-        //         while(child2.hasNext()){
-        //             System.out.println("CHILD 1");
-        //             System.out.println(child1Next.getFields().toString());
-        //             System.out.println("CHILD 2");
-        //             System.out.println(child2.next().getFields().toString());
-        //         }
-        //     }
-        // }
-        // return null;
-        //ITERATES first row outer through all inners
-        // if(next1==null){
-        //     next1 = child1.next();
-        // }   
         
-        
-        while(child1.hasNext()){
-            next1 = child1.next();
+        while(child1.hasNext()||next1!=null){
+            if(next1==null){
+                next1 = child1.next();
+            }
             while(child2.hasNext()){
                 Tuple next2 = child2.next();
                 if(p.filter(next1, next2)){
-                    System.out.println("CHILD 1");
-                    System.out.println(next1.getFields().toString());
-                    System.out.println("CHILD 2");
-                    System.out.println(next2.getFields().toString());
+                    Tuple toReturn = new Tuple(getTupleDesc());
+                    int toReturnI = 0;
+                    for(int i=0; i<next1.getFields().size();i++){
+                        toReturn.setField(toReturnI, next1.getField(i));
+                        toReturnI++;
+                    }
+                    for(int i=0; i<next2.getFields().size();i++){
+                        toReturn.setField(toReturnI, next2.getField(i));
+                        toReturnI++;
+                    }
+                    return toReturn;
                 }
             }
             child2.rewind();
-            // if (!child1.hasNext()){
-            //     child1.rewind();
-            // }
+            next1=null;
         }
-
         return null;
-        //CODE
-        // System.out.printf("Child 1:%s",child1.next().toString());
-        // while(next1!=null){
-        //     while(next2.hasNext()){  
-        //         Tuple child2Next = next2.next();
-        //         if(p.filter(next1, child2Next)){
-        //             Tuple toReturn = new Tuple(getTupleDesc());
-        //             int i = 0;
-        //             int s = next1.getFields().size();
-        //             while (i<s){
-        //                 toReturn.setField(i, next1.getField(i));
-        //                 i++;
-        //             }
-        //             s = child2Next.getFields().size();
-        //             while (i<s){
-        //                 toReturn.setField(i, child2Next.getField(i));
-        //                 i++;
-        //             }
-        //             System.out.println(toReturn);
-        //             return toReturn;
-        //         }
-        //     }
-        //     next2 = child2;
-        //     next1=child1.next();
-        // }
-        // next1=child1.next();
-        // next2 = child2;
-        // while(next2.hasNext()){  
-        //     Tuple child2Next = next2.next();
-        //     if(p.filter(next1, child2Next)){
-        //         Tuple toReturn = new Tuple(getTupleDesc());
-        //         int i = 0;
-        //         int s = next1.getFields().size();
-        //         while (i<s){
-        //             toReturn.setField(i, next1.getField(i));
-        //             i++;
-        //         }
-        //         s = child2Next.getFields().size();
-        //         while (i<s){
-        //             toReturn.setField(i, child2Next.getField(i));
-        //             i++;
-        //         }
-        //         System.out.println(toReturn);
-        //         return toReturn;
-        //     }
-        // }
-        // return null;
-        ////PAUSE
-        // while(child2.hasNext()){
-        //     Tuple child2Next = child2.next();
-        //     if(p.filter(next1, child2Next)){
-        //         Tuple toReturn = new Tuple(getTupleDesc());
-        //         int i = 0;
-        //         int s = next1.getFields().size();
-        //         while (i<s){
-        //             toReturn.setField(i, next1.getField(i));
-        //             i++;
-        //         }
-        //         s = child2Next.getFields().size();
-        //         while (i<s){
-        //             toReturn.setField(i, child2Next.getField(i));
-        //             i++;
-        //         }
-        //         return toReturn;
-        //     }
-        // }
-        // // }
-        // //next1=child1.next();
-        // return null;
-
     }
 
     @Override

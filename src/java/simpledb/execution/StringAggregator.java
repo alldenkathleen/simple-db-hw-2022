@@ -1,7 +1,14 @@
 package simpledb.execution;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import simpledb.common.Type;
+import simpledb.storage.Field;
+import simpledb.storage.IntField;
 import simpledb.storage.Tuple;
+import simpledb.storage.TupleDesc;
+import simpledb.storage.TupleIterator;
 
 /**
  * Knows how to compute some aggregate over a set of StringFields.
@@ -9,6 +16,11 @@ import simpledb.storage.Tuple;
 public class StringAggregator implements Aggregator {
 
     private static final long serialVersionUID = 1L;
+    private int gbfield;
+    private Type gbfieldtype;
+    private int afield;
+    private Op what;
+    private HashMap<Field, Integer> aggregate;
 
     /**
      * Aggregate constructor
@@ -21,7 +33,11 @@ public class StringAggregator implements Aggregator {
      */
 
     public StringAggregator(int gbfield, Type gbfieldtype, int afield, Op what) {
-        // TODO: some code goes here
+        this.gbfield = gbfield;
+        this.gbfieldtype = gbfieldtype;
+        this.afield = afield;
+        this.what = what;
+        this.aggregate = new HashMap<Field,Integer>();
     }
 
     /**
@@ -30,7 +46,24 @@ public class StringAggregator implements Aggregator {
      * @param tup the Tuple containing an aggregate field and a group-by field
      */
     public void mergeTupleIntoGroup(Tuple tup) {
-        // TODO: some code goes here
+        IntField gb;
+        if(gbfieldtype==null){
+            gb = new IntField(0);
+        }
+        else{
+            gb = (IntField)tup.getField(gbfield);
+        }
+        if (aggregate.containsKey(gb)){
+            if (what.equals(Op.COUNT)){
+                int count = aggregate.get(gb)+1;
+                aggregate.put(gb, count);
+            }
+        }
+        else{
+            if(what.equals(Op.COUNT)){
+                aggregate.put(gb, 1);
+            }
+        }
     }
 
     /**
@@ -42,8 +75,36 @@ public class StringAggregator implements Aggregator {
      *         aggregate specified in the constructor.
      */
     public OpIterator iterator() {
-        // TODO: some code goes here
-        throw new UnsupportedOperationException("please implement me for lab2");
+        if(gbfieldtype!=null){
+            Type[] typeAr = new Type[]{gbfieldtype,Type.INT_TYPE};
+            TupleDesc tD = new TupleDesc(typeAr);
+            ArrayList<Tuple> tuples = new ArrayList<>();
+            for(Field gb: aggregate.keySet()){
+                IntField agg = new IntField(aggregate.get(gb));
+                Tuple tuple = new Tuple(tD);
+                tuple.setField(0, gb);
+                tuple.setField(1, agg);
+                tuples.add(tuple);
+            }
+            // System.out.println(tuples.toString());
+            TupleIterator tuplesIterator = new TupleIterator(tD, tuples);
+            return tuplesIterator;
+        }
+        else{
+            Type[] typeAr = new Type[]{Type.INT_TYPE};
+            TupleDesc tD = new TupleDesc(typeAr);
+            ArrayList<Tuple> tuples = new ArrayList<>();
+            if(aggregate.isEmpty()){
+                TupleIterator tuplesIterator = new TupleIterator(tD, tuples);
+                return tuplesIterator;
+            }
+            IntField agg = new IntField(aggregate.get(new IntField(0)));
+            Tuple tuple = new Tuple(tD);
+            tuple.setField(0, agg);
+            tuples.add(tuple);
+            TupleIterator tuplesIterator = new TupleIterator(tD, tuples);
+            return tuplesIterator;
+        }
     }
 
 }

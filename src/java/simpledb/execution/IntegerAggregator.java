@@ -1,7 +1,17 @@
 package simpledb.execution;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import simpledb.common.Type;
+import simpledb.storage.Field;
+import simpledb.storage.IntField;
 import simpledb.storage.Tuple;
+import simpledb.storage.TupleDesc;
+import simpledb.storage.TupleIterator;
 
 /**
  * Knows how to compute some aggregate over a set of IntFields.
@@ -13,6 +23,9 @@ public class IntegerAggregator implements Aggregator {
     private Type gbfieldtype;
     private int afield;
     private Op what;
+    private Map<Field,Integer> aggregate;
+    private HashMap<Field,Integer> num;
+    private HashMap<Field,Integer> den;
 
     /**
      * Aggregate constructor
@@ -30,8 +43,12 @@ public class IntegerAggregator implements Aggregator {
         this.gbfieldtype = gbfieldtype;
         this.afield = afield;
         this.what = what;
+        this.aggregate = new HashMap<Field,Integer>();
+        this.num = new HashMap<Field,Integer>();
+        this.den = new HashMap<Field,Integer>();
     }
 
+    
     /**
      * Merge a new tuple into the aggregate, grouping as indicated in the
      * constructor
@@ -39,7 +56,59 @@ public class IntegerAggregator implements Aggregator {
      * @param tup the Tuple containing an aggregate field and a group-by field
      */
     public void mergeTupleIntoGroup(Tuple tup) {
-        // TODO: some code goes here
+        // System.out.println(aggregate.toString());
+        Field gb;
+        if(gbfieldtype==null){
+            gb = new IntField(0);
+        }
+        else{
+            gb = (Field)tup.getField(gbfield);
+        }
+        if (aggregate.containsKey(gb)){
+            IntField agg = (IntField)tup.getField(afield);
+            if(what.equals(Op.AVG)){
+                int avg = (num.get(gb)+agg.getValue())/(den.get(gb)+1);
+                num.put(gb,num.get(gb)+agg.getValue());
+                den.put(gb,den.get(gb)+1);
+                aggregate.put(gb, avg);
+            }
+            else if (what.equals(Op.COUNT)){
+                int count = aggregate.get(gb)+1;
+                aggregate.put(gb, count);
+            }
+            else if (what.equals(Op.MAX)){
+                int currentMax = aggregate.get(gb);
+                if(currentMax<agg.getValue()){
+                    currentMax = agg.getValue();
+                }
+                aggregate.put(gb,currentMax);
+            }
+            else if (what.equals(Op.MIN)){
+                int currentMin = aggregate.get(gb);
+                if(currentMin>agg.getValue()){
+                    currentMin = agg.getValue();
+                }
+                aggregate.put(gb,currentMin);
+            }
+            else if (what.equals(Op.SUM)){
+                int sum = aggregate.get(gb)+agg.getValue();
+                aggregate.put(gb, sum);
+            }
+        }
+        else{
+            if(what.equals(Op.COUNT)){
+                aggregate.put(gb, 1);
+            }
+            else{
+                IntField agg = (IntField)tup.getField(afield);
+                aggregate.put(gb, agg.getValue());
+                if(what.equals(Op.AVG)){
+                    num.put(gb,agg.getValue());
+                    den.put(gb,1);
+                }
+                // System.out.println(aggregate.toString());
+            }
+        }
     }
 
     /**
@@ -51,9 +120,37 @@ public class IntegerAggregator implements Aggregator {
      *         the constructor.
      */
     public OpIterator iterator() {
-        // TODO: some code goes here
-        throw new
-        UnsupportedOperationException("please implement me for lab2");
+        if(gbfieldtype!=null){
+            Type[] typeAr = new Type[]{gbfieldtype,Type.INT_TYPE};
+            TupleDesc tD = new TupleDesc(typeAr);
+            ArrayList<Tuple> tuples = new ArrayList<>();
+            for(Field gb: aggregate.keySet()){
+                IntField agg = new IntField(aggregate.get(gb));
+                Tuple tuple = new Tuple(tD);
+                tuple.setField(0, gb);
+                tuple.setField(1, agg);
+                tuples.add(tuple);
+            }
+            // System.out.println(tuples.toString());
+            TupleIterator tuplesIterator = new TupleIterator(tD, tuples);
+            return tuplesIterator;
+        }
+        else{
+            Type[] typeAr = new Type[]{Type.INT_TYPE};
+            TupleDesc tD = new TupleDesc(typeAr);
+            ArrayList<Tuple> tuples = new ArrayList<>();
+            if(aggregate.isEmpty()){
+                TupleIterator tuplesIterator = new TupleIterator(tD, tuples);
+                return tuplesIterator;
+            }
+            IntField i = new IntField(0);
+            IntField agg = new IntField(aggregate.get(i));
+            Tuple tuple = new Tuple(tD);
+            tuple.setField(0, agg);
+            tuples.add(tuple);
+            TupleIterator tuplesIterator = new TupleIterator(tD, tuples);
+            return tuplesIterator;
+        }
     }
 
 }

@@ -39,7 +39,6 @@ public class HeapFile implements DbFile {
      *          file.
      */
     public HeapFile(File f, TupleDesc td) {
-        // TODO: some code goes here
         this.f = f;
         this.td = td;
         this.tableId = this.f.getAbsoluteFile().hashCode();
@@ -58,7 +57,6 @@ public class HeapFile implements DbFile {
      * @return the File backing this HeapFile on disk.
      */
     public File getFile() {
-        // TODO: some code goes here
         return this.f;
     }
 
@@ -72,7 +70,6 @@ public class HeapFile implements DbFile {
      * @return an ID uniquely identifying this HeapFile.
      */
     public int getId() {
-        // TODO: some code goes here
         return this.tableId; 
     }
 
@@ -82,13 +79,11 @@ public class HeapFile implements DbFile {
      * @return TupleDesc of this DbFile.
      */
     public TupleDesc getTupleDesc() {
-        // TODO: some code goes here
         return this.td;
     }
 
     // see DbFile.java for javadocs
     public Page readPage(PageId pid) {
-        // TODO: some code goes here
         int pgNo = pid.getPageNumber();
         // System.out.println("READ PAGE -- " + pid + "; " + pgNo + "; " + this.numPages());
         if (pgNo >= this.numPages() || pid.getTableId() != this.getId()){
